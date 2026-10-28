@@ -207,7 +207,7 @@ $('#app').addEventListener('change',e=>{
  if(e.target.id==='difficulty')state.difficulty=e.target.value;
  if(e.target.id==='format')state.bestOf=Number(e.target.value);
 });
-function navigable(){const scope=state.modal?$('#modal-root'):state.view==='setup'?$('#setup'):$('#fight-overlay');return [...scope.querySelectorAll('button:not([disabled]),input[type="range"],select')].filter(e=>e.getClientRects().length);}
+function navigable(){const scope=state.modal?$('#modal-root'):state.view==='setup'?$('#setup'):$('#fight-overlay');const top=state.modal?[]:[...document.querySelectorAll('.topbar button:not([disabled])')];return [...top,...scope.querySelectorAll('button:not([disabled]),input[type="range"],select')].filter(e=>e.getClientRects().length);}
 function navigate(direction){
  const elements=navigable();if(!elements.length)return;
  const current=elements.includes(document.activeElement)?document.activeElement:null;
@@ -226,7 +226,7 @@ function handlePad(name){
  if(name==='confirm'||name==='start'){if(document.activeElement?.closest('#modal-root')&&document.activeElement.tagName==='BUTTON')document.activeElement.click();else $('#modal-root .primary')?.click();}return;
  }
  if(state.view==='setup'){
- if(name==='confirm'){if(document.activeElement?.tagName==='BUTTON')document.activeElement.click();else navigable()[0]?.focus();}
+ if(name==='confirm'){if(document.activeElement?.tagName==='BUTTON')document.activeElement.click();else if(document.activeElement?.tagName==='SELECT'){const s=document.activeElement;s.selectedIndex=(s.selectedIndex+1)%s.options.length;s.dispatchEvent(new Event('change',{bubbles:true}));}else if(!navigable().includes(document.activeElement))navigable()[0]?.focus();}
  if(name==='start')ready();
  if(name==='secondary')action('random');
  if(name==='tabPrev'||name==='tabNext'){const n=tabs.findIndex(t=>t[0]===state.tab);action('tab',tabs[(n+(name==='tabNext'?1:3))%4][0]);$('.forge-tabs .active')?.focus({preventScroll:true});}

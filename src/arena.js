@@ -144,10 +144,12 @@ export class Arena {
     this.container=container;this.onImpact=onImpact;this.preview=true;this.cameraMode='cinematic';this.quality='high';
     this.scene=new THREE.Scene();this.scene.background=new THREE.Color(0x18221e);this.scene.fog=new THREE.FogExp2(0x18221e,0.047);
     this.camera=new THREE.PerspectiveCamera(37,1,0.1,80);this.camera.position.set(6,4.1,11);
-    this.renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
-    this.renderer.setPixelRatio(Math.min(devicePixelRatio,1.8));this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=THREE.PCFSoftShadowMap;this.renderer.toneMapping=THREE.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.25;container.appendChild(this.renderer.domElement);
+    const isXbox=/Xbox/i.test(navigator.userAgent);
+    try{this.renderer=new THREE.WebGLRenderer({antialias:!isXbox,alpha:false,powerPreference:'high-performance'});}
+    catch{this.renderer=new THREE.WebGLRenderer({antialias:false,alpha:false,powerPreference:'default'});}
+    this.renderer.setPixelRatio(Math.min(devicePixelRatio,isXbox?1:1.8));this.renderer.shadowMap.enabled=!isXbox;this.renderer.shadowMap.type=THREE.PCFSoftShadowMap;this.renderer.toneMapping=THREE.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.25;container.appendChild(this.renderer.domElement);
     this.scene.add(new THREE.HemisphereLight(0xd1e8dc,0x33342c,2.2));
-    const key=new THREE.DirectionalLight(0xffe5bd,3.8);key.position.set(-3,9,5);key.castShadow=true;key.shadow.mapSize.set(2048,2048);Object.assign(key.shadow.camera,{left:-9,right:9,top:8,bottom:-8});key.shadow.bias=-0.0008;this.scene.add(key);
+    const key=new THREE.DirectionalLight(0xffe5bd,3.8);key.position.set(-3,9,5);key.castShadow=!isXbox;key.shadow.mapSize.set(isXbox?1024:2048,isXbox?1024:2048);Object.assign(key.shadow.camera,{left:-9,right:9,top:8,bottom:-8});key.shadow.bias=-0.0008;this.scene.add(key);
     const rim=new THREE.DirectionalLight(0x92aab3,2.3);rim.position.set(4,5,-5);this.scene.add(rim);
     this.flash=new THREE.PointLight(0xffbe76,0,7);this.scene.add(this.flash);
     this.fighters=[];this.torches=[];this.sparks=[];this.waves=[];this.lastImpact=-1;this.camTarget=new THREE.Vector3(0,1.1,0);this.shake=0;

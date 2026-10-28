@@ -30,7 +30,9 @@ export class Controller {
     window.addEventListener('gamepaddisconnected',()=>this.poll(performance.now()));
   }
   poll(now){
-    this.pads=Array.from(navigator.getGamepads?.()||[]).filter(p=>p?.connected&&p.mapping==='standard');
+    const allPads=Array.from(navigator.getGamepads?.()||[]).filter(p=>p?.connected);
+    const stdPads=allPads.filter(p=>p.mapping==='standard');
+    this.pads=stdPads.length?stdPads:allPads;
     if(this.pads.length!==this.count){this.count=this.pads.length;this.onChange(this.pads);}
     const required=this.seat();
     for(let n=0;n<this.pads.length;n++){
